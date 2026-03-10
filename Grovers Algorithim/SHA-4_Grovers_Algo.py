@@ -15,7 +15,7 @@ qc.h(tgt)
 
 # Oracle loop
 def apply_oracle(circuit):
-    # Shift-XOR Hash
+    # Forward Hash
     circuit.cx(key[0], key[1])
     circuit.cx(key[1], key[2])
     circuit.cx(key[2], key[3])
@@ -27,7 +27,8 @@ def apply_oracle(circuit):
     #circuit.x(key[2])
     #circuit.x(key[3])
 
-    # The Tripwire: 4-controlled NOT
+    # Phase Kickback
+    # This fires only when the 'key' register matches the target hash
     circuit.mcx(key[0:4], tgt[0])
     
     # Undo Trap
@@ -36,7 +37,7 @@ def apply_oracle(circuit):
     #circuit.x(key[2])
     #circuit.x(key[3])
 
-    # The Mirror
+    # Reverse Hash
     circuit.cx(key[2], key[3])
     circuit.cx(key[1], key[2])
     circuit.cx(key[0], key[1])
@@ -69,7 +70,7 @@ counts = result.get_counts()
 fixed_counts = {k[::-1]: v for k, v in counts.items()}
 sorted_counts = sorted(fixed_counts.items(), key=operator.itemgetter(1), reverse=True)
 
-print(f"\n4-BIT Key Crack")
+print(f"\nSHA-4-BIT Key Crack")
 print(f"Target hash: {target_hash}")
 print("-" * 37)
 
