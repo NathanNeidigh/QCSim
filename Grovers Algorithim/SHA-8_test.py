@@ -1,36 +1,40 @@
-def toy_sha8_hash(input_key_str):
+def toy_sha8_nonlinear(key_string):
     """
-    Classical version of the 8-bit Shift-XOR Hash.
-    Mimics: circuit.cx(key[i], key[i+1])
+    Encrypts an 8-bit string using a non-linear Ripple-XOR + AND logic.
+    Logic: H[i] = K[i] ^ (H[i-1] AND H[i-2])
     """
-    # Convert string to list of integers
-    x = [int(bit) for bit in input_key_str]
-    
-    # Replicate the Ripple XOR logic (Forward Hash)
-    # Each bit is XORed with the one before it
-    for i in range(1, 8):
-        x[i] = x[i] ^ x[i-1]
+    # Convert string '0110...' to a list of integers [0, 1, 1, 0...]
+    bits = [int(b) for b in key_string]
+    hash_result = [0] * 8
 
-    # Convert back to string
-    return "".join(str(bit) for bit in x)
+    # 1. Bit 0 is the anchor (Direct copy)
+    hash_result[0] = bits[0]
 
-# 1. Create the full mapping
-hash_to_key_map = {}
+    # 2. Bit 1 is linear (XOR with previous bit result)
+    hash_result[1] = bits[1] ^ hash_result[0]
 
+    # 3. Bits 2 through 7 are NON-LINEAR
+    # Each bit is XORed with the 'AND' of the two previous results
+    for i in range(2, 8):
+        # The Non-Linear 'CCX' logic
+        non_linear_term = hash_result[i-1] & hash_result[i-2]
+        hash_result[i] = bits[i] ^ non_linear_term
+
+    # Convert back to a string for easy reading
+    return "".join(str(b) for b in hash_result)
+
+# --- TEST CASE ---
+test_key = "01100101"
+result_hash = toy_sha8_nonlinear(test_key)
+
+print(f"Classical Non-Linear Encryption")
+print(f"-------------------------------")
+print(f"Input Key:  {test_key}")
+print(f"Output Hash: {result_hash}")
+
+print(f"\nVerification Table (First 10 entries):")
+print(f"Key      | Non-Linear Hash")
+print(f"--------------------------")
 for i in range(256):
-    # Create an 8-bit binary string (e.g., "00001010")
-    key_str = format(i, '08b')
-    # Generate the hash
-    hash_str = toy_sha8_hash(key_str)
-    # Store it
-    hash_to_key_map[hash_str] = key_str
-
-# 2. Sort the hashes numerically to make the table easy to read
-sorted_hashes = sorted(hash_to_key_map.keys())
-
-# 3. Print the formatted list
-print(f"{'Hash':<8}  | {'Key':<8}")
-print("-" * 20)
-
-for h in sorted_hashes:
-    print(f"{h} -> {hash_to_key_map[h]}")
+    key = format(i, '08b')
+    print(f"{key} -> {toy_sha8_nonlinear(key)}")
