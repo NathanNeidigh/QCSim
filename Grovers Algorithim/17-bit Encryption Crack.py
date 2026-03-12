@@ -24,7 +24,7 @@ qc.h(key) # Superposition of all 131,072 keys
 qc.x(tgt) # Initialize target to |1>
 qc.h(tgt) # Flip target to |-> for phase kickback
 
-targethash = '10010000111010010'
+targethash = '11010001001100011'
 
 # Oracle Function
 def apply_oracle(circuit):
@@ -35,8 +35,8 @@ def apply_oracle(circuit):
 
     # Trap to target the specific 17-bit Hash)
     # Identify where your target hash string has '0' and update this list with the '0' positions from hash
-    # Example Hash: 10010000111010010
-    hash_zeros = [1,2,4,5,6,7,11,13,14,16] 
+    # Example Hash: 11010001001100011
+    hash_zeros = [2,4,5,6,8,9,12,13,14] 
     
     for bit in hash_zeros:
         circuit.x(key[bit])
@@ -63,8 +63,8 @@ def apply_diffuser(circuit):
     circuit.x(key)
     circuit.h(key)
 
-# Optimal for 17-bit is ~284; 250 is good enough
-iterations = 250
+# Optimal for 17-bit is 284; 250 is good enough
+iterations = 10
 for _ in range(iterations):
     apply_oracle(qc)
     apply_diffuser(qc)
@@ -83,12 +83,12 @@ sorted_counts = sorted(fixed_counts.items(), key=operator.itemgetter(1), reverse
 
 print(f"\n\n17-Bit Non-Linear Key Crack")
 print(f"Target Hash: {targethash}")
-for i in range(min(3, len(sorted_counts))):
-    state, count = sorted_counts[i]
-    print(f"Rank {i+1}: Key {state} | Probability: {(count/1024)*100:.1f}%")
-
 top_binary_state = sorted_counts[0][0]
+print(f"Cracked Key: {top_binary_state}")
 decoded_sign, decoded_hex = binary_17bit_to_hex(top_binary_state)
 
-print(f"Origional Input Password:      {decoded_sign}{decoded_hex}")
-print("\n\n")
+print(f"Initial Input Password:      {decoded_sign}{decoded_hex}\n")
+
+# 01101101101101100
+# 01101101101101100
+

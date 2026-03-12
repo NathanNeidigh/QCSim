@@ -1,5 +1,6 @@
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile
 from qiskit_aer import AerSimulator
+from qiskit.quantum_info import Statevector
 import operator
 
 # Setup the 4-bit Key Space
@@ -48,6 +49,10 @@ def apply_diffuser(circuit):
     # MCZ for 4 bits (H-MCX-H)
     circuit.h(key[3])
     circuit.mcx(key[0:3], key[3])
+
+    #state = Statevector.from_instruction(circuit)
+    #print(state.data)
+
     circuit.h(key[3])
     circuit.x(key)
     circuit.h(key)

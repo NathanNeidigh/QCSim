@@ -29,7 +29,7 @@ def sha17_nonlinear(key_string):
 
 # ADD INPUT DATA HERE
 input_sign = "-"
-input_hex = "A1B2" # 4-digit hex
+input_hex = "6273" # 4-digit hex
 
 # Step 1: Encode
 binary_key = hex_to_17bit_binary(input_sign, input_hex)
